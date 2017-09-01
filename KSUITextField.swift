@@ -2,7 +2,7 @@
 //  KSUITextField.swift
 //
 //  Created by Kusuma Seta on 9/1/17.
-//  Copyright © 2017 com.klikquick. All rights reserved.
+//  Copyright © 2017 com.ework. All rights reserved.
 //
 
 import UIKit
@@ -51,15 +51,11 @@ class KSUITextField: UITextField {
     
     private func setupTarget(){
         addTarget(self, action: #selector(editingEnd), for:.editingDidEnd)
-        
-        
         addTarget(self, action: #selector(editingBegin), for:.editingDidBegin)
-        
         addTarget(self, action: #selector(editingChanged), for: .editingChanged)
-        
     }
+    
     private func setupKeyboard(){
-        
         switch textFieldType {
         case .password:
             self.isSecureTextEntry = true
@@ -76,18 +72,13 @@ class KSUITextField: UITextField {
             break;
         }
     }
-    
     private func setupView(){
         if(self.isEndOfForm) {
             self.returnKeyType = .done
         }
-        
         self.addSubview(errLabel)
         self.addSubview(ivIndicator)
-        
         ivIndicator.anchor(topAnchor, left: nil, bottom: bottomAnchor, right: rightAnchor, topConstant: 8, leftConstant: 0, bottomConstant: 8, rightConstant: 8, widthConstant: 25, heightConstant: 25)
-        
-        
         errLabel.anchor(topAnchor, left: leftAnchor, bottom: bottomAnchor, right: ivIndicator.leftAnchor, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 8, widthConstant: 0, heightConstant: 0)
     }
     
@@ -96,13 +87,10 @@ class KSUITextField: UITextField {
             return ("", true)
         }
         else{
-            
             let value = self.text
-            
             if value?.characters.count == 0 {
                 return ("\(self.tfKey) tidak boleh kosong", false)
             }
-            
             var flag = true
             switch textFieldType {
             case .password:
@@ -126,7 +114,7 @@ class KSUITextField: UITextField {
     func editingBegin(sender: UITextField){
         self.reset()
     }
-    
+
     func editingEnd(sender: UITextField){
         let validation : (String,Bool) = self.standartKQValidation()
         if  validation.1 == false {
@@ -157,6 +145,5 @@ class KSUITextField: UITextField {
         self.ivIndicator.image = #imageLiteral(resourceName: "ic_success")
         self.errLabel.text = ""
     }
-    
 
 }
