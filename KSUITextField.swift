@@ -1,8 +1,8 @@
 //
-//  KSUITextField.swift
+//  CoreUITextField.swift
 //
 //  Created by Kusuma Seta on 9/1/17.
-//  Copyright © 2017 com.ework. All rights reserved.
+//  Copyright © 2017 com.klikquick. All rights reserved.
 //
 
 import UIKit
@@ -14,14 +14,29 @@ enum KSTextFieldType {
     case phone
 }
 
+protocol KSUITextFieldDelegate {
+    func beginEditing(textField: KSUITextField)
+    func endEditing(textField: KSUITextField)
+    func changeVal(textField: KSUITextField)
+}
+
 class KSUITextField: UITextField {
     var tfKey = ""
     var maxLength: Int = 24
     var isOptional: Bool = false
     var isEndOfForm: Bool = false
     
+    var ksdelegate: KSUITextFieldDelegate?
+    
     var textFieldType: KSTextFieldType = {
        return KSTextFieldType.text
+    }()
+    var placeHolderDefault: String = ""
+    var imageSuccess: UIImage = {
+        return #imageLiteral(resourceName: "ic_success")
+    }()
+    var imageError: UIImage = {
+        return #imageLiteral(resourceName: "ic_error")
     }()
     
     var ivIndicator: UIImageView = {
@@ -42,6 +57,9 @@ class KSUITextField: UITextField {
         super.awakeFromNib()
         setupTarget()
         setupView()
+        if let placeholder = self.placeholder {
+            self.placeHolderDefault = placeholder
+        }
     }
     
     override func layoutSubviews() {
@@ -56,6 +74,7 @@ class KSUITextField: UITextField {
     }
     
     private func setupKeyboard(){
+        
         switch textFieldType {
         case .password:
             self.isSecureTextEntry = true
@@ -72,13 +91,19 @@ class KSUITextField: UITextField {
             break;
         }
     }
+    
     private func setupView(){
         if(self.isEndOfForm) {
             self.returnKeyType = .done
         }
+        
         self.addSubview(errLabel)
         self.addSubview(ivIndicator)
-        ivIndicator.anchor(topAnchor, left: nil, bottom: bottomAnchor, right: rightAnchor, topConstant: 8, leftConstant: 0, bottomConstant: 8, rightConstant: 8, widthConstant: 25, heightConstant: 25)
+        
+        ivIndicator.anchorCenterYToSuperview()
+        ivIndicator.anchor(nil, left: nil, bottom: nil, right: rightAnchor, topConstant: 8, leftConstant: 0, bottomConstant: 8, rightConstant: 8, widthConstant: 25, heightConstant: 25)
+        
+        
         errLabel.anchor(topAnchor, left: leftAnchor, bottom: bottomAnchor, right: ivIndicator.leftAnchor, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 8, widthConstant: 0, heightConstant: 0)
     }
     
@@ -87,10 +112,13 @@ class KSUITextField: UITextField {
             return ("", true)
         }
         else{
+            
             let value = self.text
+            
             if value?.characters.count == 0 {
                 return ("\(self.tfKey) tidak boleh kosong", false)
             }
+            
             var flag = true
             switch textFieldType {
             case .password:
@@ -112,9 +140,13 @@ class KSUITextField: UITextField {
     }
     
     func editingBegin(sender: UITextField){
+        
         self.reset()
+        if ksdelegate != nil {
+            ksdelegate?.beginEditing(textField: self)
+        }
     }
-
+    
     func editingEnd(sender: UITextField){
         let validation : (String,Bool) = self.standartKQValidation()
         if  validation.1 == false {
@@ -124,26 +156,35 @@ class KSUITextField: UITextField {
             setSuccess()
             self.resignFirstResponder()
         }
+        if ksdelegate != nil {
+            ksdelegate?.endEditing(textField: self)
+        }
     }
     
     func editingChanged(sender: UITextField) {
         guard let text = sender.text?.characters.prefix(maxLength) else { return }
         sender.text = String(text)
+        if ksdelegate != nil {
+            ksdelegate?.changeVal(textField: self)
+        }
     }
     
     private func reset(){
+        self.placeholder = self.placeHolderDefault
         self.ivIndicator.image = UIImage()
         self.errLabel.text = ""
     }
     
     func setError(withString: String){
-        self.ivIndicator.image = #imageLiteral(resourceName: "ic_error")
+        self.ivIndicator.image = imageError
         self.errLabel.text = withString
+        self.placeholder = ""
     }
     
     func setSuccess(){
-        self.ivIndicator.image = #imageLiteral(resourceName: "ic_success")
+        self.ivIndicator.image = imageSuccess
         self.errLabel.text = ""
     }
+    
 
 }
