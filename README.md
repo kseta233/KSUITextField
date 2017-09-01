@@ -13,6 +13,13 @@ tftest.maxLength = 25 //max length of textfield
 tftest.isEndOfForm = true //to determine keyboard return type, default = false
 tftest.isOptional = true //to determine strict validation, default = false
 ```
+
+## State Fail/Success
+error : http://prntscr.com/gfvg0s
+success : http://prntscr.com/gfvh11
+
+
+
 ## Notes     
 TextField Type determine the input type and standart validation
 Extension for validation with regex included.
